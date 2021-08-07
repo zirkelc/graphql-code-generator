@@ -26,11 +26,14 @@ export type GqlTagConfig = {
    * ```
    */
   augmentedModuleName?: string;
+  /** Whether fragment types should be masked or not. */
+  maskFragments?: boolean;
 };
 
 export const preset: Types.OutputPreset<GqlTagConfig> = {
   buildGeneratesSection: options => {
     const visitor = new ClientSideBaseVisitor(options.schemaAst!, [], options.config, options.config);
+    const maskFragments = options?.presetConfig?.maskFragments ?? false;
     const sourcesWithOperations = processSources(options.documents, node => {
       if (node.kind === 'FragmentDefinition') {
         return visitor.getFragmentVariableName(node);
@@ -63,13 +66,18 @@ export const preset: Types.OutputPreset<GqlTagConfig> = {
 
     const artifactFileExtension = options.presetConfig.augmentedModuleName == null ? `ts` : `d.ts`;
 
+    const config = {
+      ...options.config,
+      inlineFragmentTypes: maskFragments ? 'mask' : options.config['inlineFragmentTypes'],
+    };
+
     return [
       {
         filename: `${options.baseOutputDir}/graphql.ts`,
         plugins,
         pluginMap,
         schema: options.schema,
-        config: options.config,
+        config,
         documents: sources,
       },
       {
@@ -78,7 +86,7 @@ export const preset: Types.OutputPreset<GqlTagConfig> = {
         pluginMap,
         schema: options.schema,
         config: {
-          ...options.config,
+          ...config,
           augmentedModuleName: options.presetConfig.augmentedModuleName,
         },
         documents: sources,
