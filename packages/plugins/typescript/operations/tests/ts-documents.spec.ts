@@ -4634,7 +4634,7 @@ function test(q: GetEntityBrandDataQuery): void {
           { __typename?: 'User' }
           & Pick<User, 'name'>
         )> }
-      );`);
+      ) | {};`);
     });
 
     it('#2436 - interface with field of same name but different type is correctly handled', async () => {
@@ -5591,7 +5591,7 @@ export type KittyQuery = { __typename?: 'Query', animals: Array<{ __typename?: '
       );
     });
 
-    it('On avoidOptionals:true, optionals (?) on types should be avoided', async () => {
+    it('Conditional directives should override avoidOptionals:true', async () => {
       const schema = buildSchema(/* GraphQL */ `
         type Query {
           me: User!
@@ -5692,7 +5692,7 @@ export type KittyQuery = { __typename?: 'Query', animals: Array<{ __typename?: '
           __typename?: 'Group',
           id: number
         }
-      };`);
+      } | {};`);
     });
   });
 
@@ -5744,7 +5744,7 @@ export type KittyQuery = { __typename?: 'Query', animals: Array<{ __typename?: '
         { __typename?: 'Group' }
         & Pick<Group, 'id'>
       ) }
-    );`);
+    ) | {};`);
   });
 
   it('handles unnamed queries', async () => {
